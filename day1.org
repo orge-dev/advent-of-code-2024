@@ -1122,3 +1122,19 @@ The Python equivalent would be:
 #+begin_src python
 similarity_score = sum(x * list2.count(x) for x in list1)
 #+end_src
+
+
+* Full code
+
+#+begin_src  elisp
+(setq list1 (cl-loop for x in raw_input by 'cddr collect x)
+      list2 (cl-loop for x in (cdr raw_input) by 'cddr collect x))
+
+(setq sorted1 (sort list1 '<)
+      sorted2 (sort list2 '<))
+
+(setq sum-of-diffs
+      (cl-loop for x in sorted1
+               for y in sorted2
+               sum (abs (- x y))))
+#+end_src
