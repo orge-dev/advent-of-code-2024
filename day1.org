@@ -1110,3 +1110,15 @@ sum_of_diffs = sum(abs(x - y) for x, y in zip(sorted1, sorted2))
 
 * Part 2
 
+#+begin_src elisp
+;; For each number in list1, count how many times it appears in list2
+;; Then multiply and sum
+(setq similarity-score
+      (cl-loop for x in list1
+               sum (* x (cl-count x list2))))
+#+end_src
+
+The Python equivalent would be:
+#+begin_src python
+similarity_score = sum(x * list2.count(x) for x in list1)
+#+end_src
