@@ -1,5 +1,12 @@
-* Part 1
-** First, create a list of numbers, from the text input.
+This is an org mode file containing Emacs Lisp ➿ (and for teaching/comparison purposes, some Python 🐍) code for the advent of code problems.
+
+The *code is introduced in snippets* 💬, and the *complete code is available together at the end of each day* 📚.
+
+🚀  *NOTE: If viewing in Github, using the "outline" mode may be helpful!* 👁 🪰🦉🐐🕮🔔🍑
+
+* Day 1
+** Part 1
+*** First, create a list of numbers, from the text input.
 
 Python lists:
 #+begin_src python
@@ -11,7 +18,7 @@ Emacs lists:
 (setq my_list '(1 2 3))
 #+end_src
 
-*** Long input code
+**** Long input code
 :PROPERTIES:
 :VISIBILITY: folded
 :END:
@@ -1020,7 +1027,7 @@ Emacs lists:
 #+end_src
 
 
-** Split the raw input into two lists
+*** Split the raw input into two lists
 
 From [[info:cl#Loop Basics][Emacs Lisp Manual cl#Loop Basics]]:
 
@@ -1043,7 +1050,7 @@ This uses:
 - First loop starts from beginning 
 - Second loop starts from second element (using =cdr=)
 
-*** Note about =car=, =cdr=, and =cddr=
+**** Note about =car=, =cdr=, and =cddr=
 
 Compare to Python:
 
@@ -1061,7 +1068,7 @@ shorter_tail = my_list[2:]
 #+end_src
 
 
-** Sort the lists
+*** Sort the lists
 
 
 Here's how to sort the lists in ascending order:
@@ -1085,7 +1092,7 @@ Note: Emacs Lisp's sort modifies the original list. If you need to preserve the 
 
 
 
-** Compute the sum of the differences
+*** Compute the sum of the differences
 
 Here's how to compute the sum of the absolute differences between corresponding elements:
 
@@ -1108,7 +1115,7 @@ sum_of_diffs = sum(abs(x - y) for x, y in zip(sorted1, sorted2))
 #+end_src
 
 
-* Part 2
+** Part 2
 
 #+begin_src elisp
 ;; For each number in list1, count how many times it appears in list2
@@ -1124,7 +1131,7 @@ similarity_score = sum(x * list2.count(x) for x in list1)
 #+end_src
 
 
-* Full code
+** Full code
 
 #+begin_src  elisp
 (setq list1 (cl-loop for x in raw_input by 'cddr collect x)
@@ -1141,4 +1148,6 @@ similarity_score = sum(x * list2.count(x) for x in list1)
 (setq similarity-score
       (cl-loop for x in list1
                sum (* x (cl-count x list2))))
+
+(list sum-of-diffs similarity-score)
 #+end_src
