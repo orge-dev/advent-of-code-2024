@@ -1137,4 +1137,8 @@ similarity_score = sum(x * list2.count(x) for x in list1)
       (cl-loop for x in sorted1
                for y in sorted2
                sum (abs (- x y))))
+
+(setq similarity-score
+      (cl-loop for x in list1
+               sum (* x (cl-count x list2))))
 #+end_src
