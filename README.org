@@ -17,10 +17,10 @@ The *code is introduced in snippets* 💬, and the *complete code is available t
   - [[#part-1-1][Part 1]]
     - [[#long-input-code][Long Input Code]]
     - [[#claude-solution][Claude Solution]]
-- [[#part-2-1][Part 2]]
-  - [[#note-on-thereis-syntax-of-the-cl-loop-macro][Note on =thereis= syntax of the =cl-loop= macro]]
-  - [[#explanation][Explanation]]
-- [[#full-code-1][Full Code]]
+  - [[#part-2-1][Part 2]]
+    - [[#note-on-thereis-syntax-of-the-cl-loop-macro][Note on =thereis= syntax of the =cl-loop= macro]]
+    - [[#explanation][Explanation]]
+  - [[#full-code-1][Full Code]]
 
 * Day 1
 ** Part 1
@@ -2255,7 +2255,7 @@ def safe_report(nums):
 safe_count = sum(1 for nums in raw_input2 if safe_report(nums))
 #+end_src
 
-* Part 2
+** Part 2
 
 We'll need to check if removing any single number makes the sequence valid:
 
@@ -2273,7 +2273,7 @@ We'll need to check if removing any single number makes the sequence valid:
 #+end_src
 
 
-** Note on =thereis= syntax of the =cl-loop= macro
+*** Note on =thereis= syntax of the =cl-loop= macro
 
 From Emacs Common Lisp Lisp Emulation Manual [[info:cl#Iteration Clauses][cl#Iteration Clauses]]:
 
@@ -2284,7 +2284,7 @@ From Emacs Common Lisp Lisp Emulation Manual [[info:cl#Iteration Clauses][cl#Ite
      ‘nil’, the loop returns ‘nil’.
 #+end_quote
 
-** Explanation
+*** Explanation
 1. First checks if sequence is already safe
 2. If not, tries removing each number one at a time:
    - Uses =cl-subseq= to slice the list before and after index
@@ -2312,7 +2312,7 @@ Let's test both parts together:
  (cl-count-if #'safe-with-removal-p raw_input2))  ; Part 2
 #+end_src
 
-* Full Code
+** Full Code
 
 #+begin_src elisp
 (defun valid-differences (nums)
@@ -2334,6 +2334,7 @@ Let's test both parts together:
        (strictly-monotonic nums)))
 
 (defun safe-with-removal-p (nums)
+
   (or (safe-report-p nums)  ; First check if already safe
       (cl-loop for i from 0 below (length nums)
                ;; Create new list without element at i
