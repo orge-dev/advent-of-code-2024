@@ -18,9 +18,9 @@ The *code is introduced in snippets* 💬, and the *complete code is available t
     - [[#long-input-code][Long Input Code]]
     - [[#claude-solution][Claude Solution]]
 - [[#part-2-1][Part 2]]
-  - [[#note-on-thereis-syntax-of-the-cl-loop-macro-from-emacs-common-lisp-lisp-emulation-manual-cliteration-clauses][Note on =thereis= syntax of the =cl-loop= macro, from Emacs Common Lisp Lisp Emulation Manual cl#Iteration Clauses]]
+  - [[#note-on-thereis-syntax-of-the-cl-loop-macro][Note on =thereis= syntax of the =cl-loop= macro]]
   - [[#explanation][Explanation]]
-  - [[#full-code-1][Full Code]]
+- [[#full-code-1][Full Code]]
 
 * Day 1
 ** Part 1
@@ -2189,14 +2189,6 @@ similarity_score = sum(x * list2.count(x) for x in list1)
 ))
 #+end_src
 
-#+begin_src elisp
-(car raw_input2)
-#+end_src
-
-#+RESULTS:
-| 1 | 4 | 5 | 8 | 11 | 12 | 9 |
-
-
 
 *** Claude Solution
 
@@ -2281,7 +2273,9 @@ We'll need to check if removing any single number makes the sequence valid:
 #+end_src
 
 
-** Note on =thereis= syntax of the =cl-loop= macro, from Emacs Common Lisp Lisp Emulation Manual [[info:cl#Iteration Clauses][cl#Iteration Clauses]]
+** Note on =thereis= syntax of the =cl-loop= macro
+
+From Emacs Common Lisp Lisp Emulation Manual [[info:cl#Iteration Clauses][cl#Iteration Clauses]]:
 
 #+begin_quote
 ‘thereis CONDITION’
@@ -2318,7 +2312,7 @@ Let's test both parts together:
  (cl-count-if #'safe-with-removal-p raw_input2))  ; Part 2
 #+end_src
 
-** Full Code
+* Full Code
 
 #+begin_src elisp
 (defun valid-differences (nums)
