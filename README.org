@@ -341,9 +341,7 @@ Let's test both parts together:
       (with-temp-buffer
         (insert-file-contents "input3.txt")
         (buffer-string)))
-#+end_src
 
-#+begin_src elisp
 (defun find-mul-results (text)
   (cl-loop with start = 0
            while (string-match "mul(\\([0-9]+\\),\\([0-9]+\\))" text start)
@@ -358,3 +356,25 @@ Let's test both parts together:
 #+end_src
 
 ** Part 2
+
+#+begin_src elisp
+(defun find-mul-results-with-conditions (text)
+  (let ((enabled t)  ; Start with multiplications enabled
+        (total 0)
+        (pos 0))
+    (while (string-match "\\(do\\|don't\\)()\\|mul(\\([0-9]+\\),\\([0-9]+\\))" text pos)
+      (setq pos (match-end 0))
+      (if (match-string 1 text)
+          ;; Handle do/don't instructions
+          (setq enabled (string= (match-string 1 text) "do"))
+        ;; Handle multiplication when enabled
+        (when enabled
+          (let ((x (string-to-number (match-string 2 text)))
+                (y (string-to-number (match-string 3 text))))
+            (when (and (<= x 999) (>= x 1)
+                      (<= y 999) (>= y 1))
+              (setq total (+ total (* x y))))))))
+    total))
+
+(find-mul-results-with-conditions raw_input3)
+#+end_src
