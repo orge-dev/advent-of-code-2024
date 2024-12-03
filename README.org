@@ -1,4 +1,4 @@
-This is an org mode file containing Emacs Lisp ➿ (and for teaching/comparison purposes, some Python 🐍) code for the advent of code problems.
+This is an [[https://orgmode.org/][Org Mode]] file containing Emacs Lisp 🌀➿ (and for teaching/comparison purposes, some Python 🐍) code for the advent of code problems.
 
 The *code is introduced in snippets* 💬, and the *complete code is available together at the end of each day* 📚.
 
@@ -60,10 +60,9 @@ Here's a way to create two separate lists by taking every other element from the
 #+end_src
 
 
-This uses:
-- =by 'cddr= to skip every other element. It uses the builtin function =cddr=, and quotes ='= it, because it's a function, not a variable (different binding namespaces).
-- First loop starts from beginning 
-- Second loop starts from second element (using =cdr=)
+This uses- =by 'cddr= to skip every other element. Syntax note: It uses the builtin function =cddr=, and quotes ='= it, because it's a function, not a variable (different binding namespaces).
+First loop starts from beginning, so it gets 1st, 3rd, 5th, etc. elements
+Second loop starts from second element (using =cdr=) so it gets 2nd, 4th, 6th, etc. elements
 
 **** Note about =car=, =cdr=, and =cddr=
 
@@ -105,7 +104,6 @@ sorted2 = sorted(list2)
 #+end_src
 
 Note: Emacs Lisp's sort modifies the original list. If you need to preserve the original, you should copy it first.
-
 
 
 *** Compute the sum of the differences
