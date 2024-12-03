@@ -24,6 +24,9 @@ The *code is introduced in snippets* 💬, and the *complete code is available t
     - [[#does-removing-any-single-number-make-the-sequence-valid][Does removing any single number make the sequence valid?]]
     - [[#explanation-1][Explanation]]
   - [[#full-code-1][Full Code]]
+- [[#day-3][Day 3]]
+  - [[#part-1-2][Part 1]]
+  - [[#part-2-2][Part 2]]
 
 * Day 1
 ** Part 1
@@ -328,3 +331,30 @@ Let's test both parts together:
  (cl-count-if #'safe-with-removal-p raw_input2))  ; Part 2
 #+end_src
 
+
+* Day 3
+
+** Part 1
+
+#+begin_src elisp :results silent
+(setq raw_input3 
+      (with-temp-buffer
+        (insert-file-contents "input3.txt")
+        (buffer-string)))
+#+end_src
+
+#+begin_src elisp
+(defun find-mul-results (text)
+  (cl-loop with start = 0
+           while (string-match "mul(\\([0-9]+\\),\\([0-9]+\\))" text start)
+           do (setq start (match-end 0))
+           for x = (string-to-number (match-string 1 text))
+           for y = (string-to-number (match-string 2 text))
+           when (and (<= x 999) (>= x 1)
+                    (<= y 999) (>= y 1))
+           sum (* x y)))
+
+(find-mul-results raw_input3)
+#+end_src
+
+** Part 2
