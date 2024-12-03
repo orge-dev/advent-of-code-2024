@@ -2,7 +2,7 @@ This is an org mode file containing Emacs Lisp ➿ (and for teaching/comparison 
 
 The *code is introduced in snippets* 💬, and the *complete code is available together at the end of each day* 📚.
 
-🚀  *NOTE: If viewing in Github, using the "outline" mode may be helpful!* 👁 🪰🦉🐐🕮🔔🍑
+🚀  *NOTE: If viewing in Github, using the "outline" mode may be helpful!* 👁 🪰🦉🐐🕮🔔
 
 * Table of Contents                                                     :TOC_3:
 - [[#day-1][Day 1]]
