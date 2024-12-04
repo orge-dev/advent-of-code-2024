@@ -61,8 +61,8 @@ be very easy to learn and well-suited to its purpose.
 Here's a way to create two separate lists by taking every other element from the raw input
 
 #+begin_src elisp
-(setq list1 (cl-loop for x in raw_input by 'cddr collect x)
-      list2 (cl-loop for x in (cdr raw_input) by 'cddr collect x))
+(setq list1 (cl-loop for x in raw-input by 'cddr collect x)
+      list2 (cl-loop for x in (cdr raw-input) by 'cddr collect x))
 #+end_src
 
 
@@ -154,8 +154,8 @@ similarity_score = sum(x * list2.count(x) for x in list1)
 ** Full code
 
 #+begin_src  elisp
-(setq list1 (cl-loop for x in raw_input by 'cddr collect x)
-      list2 (cl-loop for x in (cdr raw_input) by 'cddr collect x))
+(setq list1 (cl-loop for x in raw-input by 'cddr collect x)
+      list2 (cl-loop for x in (cdr raw-input) by 'cddr collect x))
 
 (setq sorted1 (sort list1 '<)
       sorted2 (sort list2 '<))
@@ -210,7 +210,7 @@ similarity_score = sum(x * list2.count(x) for x in list1)
 
 #+begin_src elisp
 (setq safe-count
-      (cl-count-if #'safe-report-p raw_input2))
+      (cl-count-if #'safe-report-p raw-input2))
 #+end_src
 
 *** Explanation
@@ -235,7 +235,7 @@ def strictly_monotonic(nums):
 def safe_report(nums):
     return valid_differences(nums) and strictly_monotonic(nums)
 
-safe_count = sum(1 for nums in raw_input2 if safe_report(nums))
+safe_count = sum(1 for nums in raw-input2 if safe_report(nums))
 #+end_src
 
 ** Part 2
@@ -252,7 +252,7 @@ safe_count = sum(1 for nums in raw_input2 if safe_report(nums))
                thereis (safe-report-p test-nums))))
 
 (setq safe-count-with-removal
-      (cl-count-if #'safe-with-removal-p raw_input2))
+      (cl-count-if #'safe-with-removal-p raw-input2))
 #+end_src
 
 
@@ -284,7 +284,7 @@ def safe_with_removal(nums):
     return any(safe_report(nums[:i] + nums[i+1:]) 
               for i in range(len(nums)))
 
-safe_count = sum(1 for nums in raw_input2 
+safe_count = sum(1 for nums in raw-input2 
                 if safe_with_removal(nums))
 #+end_src
 
@@ -292,8 +292,8 @@ Let's test both parts together:
 
 #+begin_src elisp
 (list 
- (cl-count-if #'safe-report-p raw_input2)         ; Part 1
- (cl-count-if #'safe-with-removal-p raw_input2))  ; Part 2
+ (cl-count-if #'safe-report-p raw-input2)         ; Part 1
+ (cl-count-if #'safe-with-removal-p raw-input2))  ; Part 2
 #+end_src
 
 ** Full Code
@@ -327,11 +327,11 @@ Let's test both parts together:
                thereis (safe-report-p test-nums))))
 
 (setq safe-count-with-removal
-      (cl-count-if #'safe-with-removal-p raw_input2))
+      (cl-count-if #'safe-with-removal-p raw-input2))
 
 (list 
- (cl-count-if #'safe-report-p raw_input2)         ; Part 1
- (cl-count-if #'safe-with-removal-p raw_input2))  ; Part 2
+ (cl-count-if #'safe-report-p raw-input2)         ; Part 1
+ (cl-count-if #'safe-with-removal-p raw-input2))  ; Part 2
 #+end_src
 
 
@@ -340,7 +340,7 @@ Let's test both parts together:
 ** Part 1
 
 #+begin_src elisp :results silent
-(setq raw_input3 
+(setq raw-input3 
       (with-temp-buffer
         (insert-file-contents "input3.txt")
         (buffer-string)))
@@ -355,7 +355,7 @@ Let's test both parts together:
                     (<= y 999) (>= y 1))
            sum (* x y)))
 
-(find-mul-results raw_input3)
+(find-mul-results raw-input3)
 #+end_src
 
 ** Part 2
@@ -384,7 +384,7 @@ Let's test both parts together:
               (setq total (+ total (* x y))))))))
     total))
 
-(find-mul-results-with-conditions raw_input3)
+(find-mul-results-with-conditions raw-input3)
 #+end_src
 
 * Day 4
@@ -392,7 +392,7 @@ Let's test both parts together:
 ** Part 1
 
 #+begin_src elisp :results none
-(setq raw_input4 
+(setq raw-input4 
       (with-temp-buffer
         (insert-file-contents "input4.txt")
         (buffer-string)))
@@ -435,7 +435,7 @@ Let's test both parts together:
                              count (check-direction grid row col drow dcol))))))
 
 ;; Parse and solve
-(let ((grid (parse-grid raw_input4)))
+(let ((grid (parse-grid raw-input4)))
   (count-xmas grid))
 #+end_src
 
@@ -473,6 +473,6 @@ Let's test both parts together:
                      (or (check-x-mas grid row col) 0)))))
 
 ;; Parse and solve
-(let ((grid (parse-grid raw_input4)))
+(let ((grid (parse-grid raw-input4)))
   (count-x-mas grid))
 #+end_src
