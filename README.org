@@ -32,6 +32,7 @@ The *code is introduced in snippets* 💬, and the *complete code is available t
   - [[#part-2-3][Part 2]]
 - [[#day-5][Day 5]]
   - [[#part-1-4][Part 1]]
+  - [[#part-2-4][Part 2]]
 
 * Day 1
 ** Part 1
@@ -482,11 +483,14 @@ Let's test both parts together:
 * Day 5
 
 ** Part 1
+<<<<<<< HEAD
 
 
 Let's break this down into steps and solve it in Emacs Lisp:
 
 1. First, let's parse the input into rules and updates:
+=======
+>>>>>>> 39983eb (day 5)
 
 #+begin_src elisp
 (defun parse-input (input-text)
@@ -502,14 +506,7 @@ Let's break this down into steps and solve it in Emacs Lisp:
                                   (split-string line "," t)))
                          (split-string updates-str "\n" t))))
     (cons rules updates)))
-#+end_src
 
-#+RESULTS:
-: parse-input
-
-2. Next, let's create a function to check if a single update follows all applicable rules:
-
-#+begin_src elisp
 (defun valid-order-p (update rules)
   (let ((positions (make-hash-table)))
     ;; Record positions of each page in the update
@@ -522,14 +519,7 @@ Let's break this down into steps and solve it in Emacs Lisp:
                       (gethash after positions))
              always (< (gethash before positions)
                       (gethash after positions)))))
-#+end_src
 
-#+RESULTS:
-: valid-order-p
-
-3. Now let's find all valid updates and their middle numbers:
-
-#+begin_src elisp
 (defun middle-number (list)
   (nth (/ (length list) 2) list))
 
@@ -548,3 +538,58 @@ Let's break this down into steps and solve it in Emacs Lisp:
 (solve-part1 raw-input5)
 #+end_src
 
+** Part 2
+
+#+begin_src elisp
+(defun build-graph (pages rules)
+  "Build adjacency list for pages based on rules."
+  (let ((graph (make-hash-table)))
+    ;; Initialize empty adjacency lists
+    (dolist (page pages)
+      (puthash page nil graph))
+    ;; Add edges from rules
+    (dolist (rule rules)
+      (let ((from (car rule))
+            (to (cadr rule)))
+        (when (and (member from pages)
+                  (member to pages))
+          (push to (gethash from graph)))))
+    graph))
+
+(defun topological-sort (pages rules)
+  "Sort pages according to rules using Kahn's algorithm."
+  (let* ((graph (build-graph pages rules))
+         (in-degree (make-hash-table))
+         result
+         queue)
+    ;; Calculate in-degrees
+    (dolist (page pages)
+      (puthash page 0 in-degree))
+    (maphash (lambda (_from tos)
+               (dolist (to tos)
+                 (puthash to (1+ (gethash to in-degree)) in-degree)))
+             graph)
+    ;; Initialize queue with nodes having 0 in-degree
+    (dolist (page pages)
+      (when (zerop (gethash page in-degree))
+        (push page queue)))
+    ;; Process queue
+    (while queue
+      (let ((page (pop queue)))
+        (push page result)
+        (dolist (neighbor (gethash page graph))
+          (puthash neighbor (1- (gethash neighbor in-degree)) in-degree)
+          (when (zerop (gethash neighbor in-degree))
+            (push neighbor queue)))))
+    (nreverse result)))
+
+(defun solve-part2 (input-text)
+  (let* ((parsed (parse-input input-text))
+         (rules (car parsed))
+         (updates (cdr parsed)))
+    (cl-loop for update in updates
+             unless (valid-order-p update rules)
+             sum (middle-number (topological-sort update rules)))))
+
+(solve-part2 raw-input5)
+#+end_src
