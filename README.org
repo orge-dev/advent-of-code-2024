@@ -483,14 +483,6 @@ Let's test both parts together:
 * Day 5
 
 ** Part 1
-<<<<<<< HEAD
-
-
-Let's break this down into steps and solve it in Emacs Lisp:
-
-1. First, let's parse the input into rules and updates:
-=======
->>>>>>> 39983eb (day 5)
 
 #+begin_src elisp
 (defun parse-input (input-text)
