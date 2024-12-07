@@ -30,6 +30,8 @@ The *code is introduced in snippets* 💬, and the *complete code is available t
 - [[#day-4][Day 4]]
   - [[#part-1-3][Part 1]]
   - [[#part-2-3][Part 2]]
+- [[#day-5][Day 5]]
+  - [[#part-1-4][Part 1]]
 
 * Day 1
 ** Part 1
@@ -476,3 +478,73 @@ Let's test both parts together:
 (let ((grid (parse-grid raw-input4)))
   (count-x-mas grid))
 #+end_src
+
+* Day 5
+
+** Part 1
+
+
+Let's break this down into steps and solve it in Emacs Lisp:
+
+1. First, let's parse the input into rules and updates:
+
+#+begin_src elisp
+(defun parse-input (input-text)
+  (let* ((parts (split-string input-text "\n\n"))
+         (rules-str (car parts))
+         (updates-str (cadr parts))
+         (rules (mapcar (lambda (line)
+                         (mapcar #'string-to-number 
+                                (split-string line "|")))
+                       (split-string rules-str "\n" t)))
+         (updates (mapcar (lambda (line)
+                           (mapcar #'string-to-number 
+                                  (split-string line "," t)))
+                         (split-string updates-str "\n" t))))
+    (cons rules updates)))
+#+end_src
+
+#+RESULTS:
+: parse-input
+
+2. Next, let's create a function to check if a single update follows all applicable rules:
+
+#+begin_src elisp
+(defun valid-order-p (update rules)
+  (let ((positions (make-hash-table)))
+    ;; Record positions of each page in the update
+    (cl-loop for page in update
+             for pos from 0
+             do (puthash page pos positions))
+    ;; Check each applicable rule
+    (cl-loop for (before after) in rules
+             when (and (gethash before positions)
+                      (gethash after positions))
+             always (< (gethash before positions)
+                      (gethash after positions)))))
+#+end_src
+
+#+RESULTS:
+: valid-order-p
+
+3. Now let's find all valid updates and their middle numbers:
+
+#+begin_src elisp
+(defun middle-number (list)
+  (nth (/ (length list) 2) list))
+
+(defun solve-part1 (input-text)
+  (let* ((parsed (parse-input input-text))
+         (rules (car parsed))
+         (updates (cdr parsed)))
+    (cl-loop for update in updates
+             when (valid-order-p update rules)
+             sum (middle-number update))))
+
+(setq raw-input5 
+      (with-temp-buffer
+        (insert-file-contents "input5.txt")
+        (buffer-string)))
+(solve-part1 raw-input5)
+#+end_src
+
