@@ -674,3 +674,59 @@ Let's test both parts together:
 #+end_src
 
 ** Part 2
+
+Note: pretty slow
+
+#+begin_src elisp
+(defun simulate-path (map pos direction width height new-obstacle)
+  "Simulate guard's path with a new obstacle, returns nil if not a loop, t if loop."
+  (cl-block nil
+    (let ((visited (make-hash-table :test 'equal))
+          (path-length 0)
+          (max-steps 10000))
+      
+      ;; Store (position . direction) pairs
+      (puthash (cons pos direction) 0 visited)
+      
+      (while (and (< path-length max-steps)
+                  (in-bounds-p pos width height))
+        (let ((next-pos (next-position pos direction)))
+          (cond
+           ((or (equal next-pos new-obstacle)
+                (and (in-bounds-p next-pos width height)
+                     (char-equal (get-map-char map next-pos) ?#)))
+            (setq direction (turn-right direction)))
+           (t
+            (setq pos next-pos
+                  path-length (1+ path-length))
+            ;; Check for same position AND direction
+            (when (gethash (cons pos direction) visited)
+              (cl-return t))
+            (puthash (cons pos direction) path-length visited)))))
+      
+      (cl-return nil))))
+
+(defun find-loop-positions (input)
+  "Find all positions where adding an obstacle creates a loop."
+  (let* ((parsed (parse-map input))
+         (map (nth 0 parsed))
+         (start-pos (nth 1 parsed))
+         (start-dir (nth 2 parsed))
+         (width (nth 3 parsed))
+         (height (nth 4 parsed))
+         (loop-positions 0))
+    
+    ;; Try each position
+    (dotimes (y height)
+      (dotimes (x width)
+        (let ((pos (cons x y)))
+          (when (and (not (equal pos start-pos))  ; Not start position
+                     (char-equal (get-map-char map pos) ?.)  ; Empty space
+                     (simulate-path map start-pos start-dir width height pos))
+            (cl-incf loop-positions)))))
+    
+    loop-positions))
+
+;; Test with input
+(find-loop-positions raw-input6)
+#+end_src
