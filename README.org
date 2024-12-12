@@ -33,6 +33,9 @@ The *code is introduced in snippets* 💬, and the *complete code is available t
 - [[#day-5][Day 5]]
   - [[#part-1-4][Part 1]]
   - [[#part-2-4][Part 2]]
+- [[#day-6][Day 6]]
+  - [[#part-1-5][Part 1]]
+  - [[#part-2-5][Part 2]]
 
 * Day 1
 ** Part 1
@@ -586,210 +589,88 @@ Let's test both parts together:
 (solve-part2 raw-input5)
 #+end_src
 
+
 * Day 6
 
 ** Part 1
 
-
-
-he Historians use their fancy device again, this time to whisk you all away to the North Pole prototype suit manufacturing lab... in the year 1518! It turns out that having direct access to history is very convenient for a group of historians.
-
-You still have to be careful of time paradoxes, and so it will be important to avoid anyone from 1518 while The Historians search for the Chief. Unfortunately, a single guard is patrolling this part of the lab.
-
-Maybe you can work out where the guard will go ahead of time so that The Historians can search safely?
-
-You start by making a map (your puzzle input) of the situation. For example:
-
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-........#.
-#.........
-......#...
-The map shows the current position of the guard with ^ (to indicate the guard is currently facing up from the perspective of the map). Any obstructions - crates, desks, alchemical reactors, etc. - are shown as #.
-
-Lab guards in 1518 follow a very strict patrol protocol which involves repeatedly following these steps:
-
-If there is something directly in front of you, turn right 90 degrees.
-Otherwise, take a step forward.
-Following the above protocol, the guard moves up several times until she reaches an obstacle (in this case, a pile of failed suit prototypes):
-
-....#.....
-....^....#
-..........
-..#.......
-.......#..
-..........
-.#........
-........#.
-#.........
-......#...
-Because there is now an obstacle in front of the guard, she turns right before continuing straight in her new facing direction:
-
-....#.....
-........>#
-..........
-..#.......
-.......#..
-..........
-.#........
-........#.
-#.........
-......#...
-Reaching another obstacle (a spool of several very long polymers), she turns right again and continues downward:
-
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#......v.
-........#.
-#.........
-......#...
-This process continues for a while, but the guard eventually leaves the mapped area (after walking past a tank of universal solvent):
-
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#........
-........#.
-#.........
-......#v..
-By predicting the guard's route, you can determine which specific positions in the lab will be in the patrol path. Including the guard's starting position, the positions visited by the guard before leaving the area are marked with an X:
-
-....#.....
-....XXXXX#
-....X...X.
-..#.X...X.
-..XXXXX#X.
-..X.X.X.X.
-.#XXXXXXX.
-.XXXXXXX#.
-#XXXXXXX..
-......#X..
-In this example, the guard will visit 41 distinct positions on your map.
-
-Predict the path of the guard. How many distinct positions will the guard visit before leaving the mapped area?
-
-
-** Solution
-
-
-Here is the complete solution:
 #+begin_src elisp
 (defun parse-map (input)
-  (let ((lines (split-string input "\n" t))
-        (map (make-hash-table)))
-    (dotimes (i (length lines))
-      (dotimes (j (length (nth i lines)))
-        (puthash (cons i j) (aref (nth i lines) j) map)))
-    map))
+  "Convert string input into a 2D array and find starting position."
+  (let* ((lines (split-string input "\n" t))
+         (height (length lines))
+         (width (length (car lines)))
+         (map (make-vector height nil))
+         start-pos
+         start-dir)
+    ;; Convert to array and find start position
+    (cl-loop for line in lines
+             for y from 0
+             do (aset map y (string-to-vector line))
+             (let ((x (cl-position ?^ (aref map y))))
+               (when x
+                 (setq start-pos (cons x y)
+                       start-dir '(0 . -1))))) ; Up is -1 in y direction
+    (list map start-pos start-dir width height)))
 
-(defun guard-direction (map pos dir)
-  (let ((new-pos (cons (+ (car pos) (car dir))
-                        (+ (cdr pos) (cadr dir)))))
-    (if (gethash new-pos map)
-        (if (equal (gethash new-pos map) ?#)
-            (guard-turn dir)
-          (cons new-pos dir))
-      (cons new-pos dir))))
+(defun turn-right (direction)
+  "Return new direction after turning right 90 degrees."
+  (cons (- (cdr direction)) (car direction)))
 
-(defun guard-turn (dir)
-  (pcase dir
-    ('(0 1) '(1 0))   ; right
-    ('(1 0) '(-1 1)) ; down
-    ('(-1 1) '(0 -1)) ; left
-    ('(0 -1) '(1 -1)))) ; up
+(defun in-bounds-p (pos width height)
+  "Check if position is within map boundaries."
+  (and (>= (car pos) 0) (< (car pos) width)
+       (>= (cdr pos) 0) (< (cdr pos) height)))
 
-(defun guard-patrol (map pos dir)
-  (let ((visited (make-hash-table)))
+(defun next-position (pos direction)
+  "Calculate next position based on current position and direction."
+  (cons (+ (car pos) (car direction))
+        (+ (cdr pos) (cdr direction))))
+
+(defun get-map-char (map pos)
+  "Get character at position in map."
+  (aref (aref map (cdr pos)) (car pos)))
+
+(defun track-guard (input)
+  "Track guard's movement and return count of unique positions visited."
+  (let* ((parsed (parse-map input))
+         (map (nth 0 parsed))
+         (pos (nth 1 parsed))
+         (direction (nth 2 parsed))
+         (width (nth 3 parsed))
+         (height (nth 4 parsed))
+         (visited (make-hash-table :test 'equal)))
+    
+    ;; Mark starting position as visited
     (puthash pos t visited)
-    (cl-loop
-      do (setq pos (car (guard-direction map pos dir)))
-         (setq dir (cdr (guard-direction map pos dir)))
-      until (not (gethash pos map))
-      do (puthash pos t visited)
-      finally return (hash-table-count visited))))
-
-(let* ((input raw-input6)
-      (map (parse-map input))
-      (start (cl-loop for key being the hash-keys of map
-                      when (equal (gethash key map) ?^)
-                      return key))
-      (dir '(0 -1)))
-  (progn
-
-#+RESULTS:
-  (message "The guard will visit %d distinct positions from %S %S" (guard-patrol map start dir) start dir)))
-
-#+end_src
-
-#+RESULTS:
-: The guard will visit 1 distinct positions from (80 . 84) (0 -1)
-
-* Add debug to print every position vositied
-
-
-Here is the modified code:
-#+begin_src elisp
-(defun parse-map (input)
-  (let ((lines (split-string input "\n" t))
-        (map (make-hash-table :test 'equal)))
-    (dotimes (i (length lines))
-      (dotimes (j (length (nth i lines)))
-        (save-message-to-buffer "*My Messages*" "Putting in map %S %S" (cons i j) (aref (nth i lines) j))
-        (puthash (cons i j) (aref (nth i lines) j) map)))
-    map))
-
-(defun guard-direction (map pos dir)
-  (let ((new-pos (cons (+ (car pos) (car dir))
-                        (+ (cdr pos) (cadr dir)))))
-    (if (gethash new-pos map)
-        (if (equal (gethash new-pos map) ?#)
-            (cons new-pos (guard-turn dir))
-          (cons new-pos dir))
-      (cons new-pos dir))))
-
-(defun guard-turn (dir)
-  (pcase dir
-    ('(0 1) '(1 0))   ; right
-    ('(1 0) '(-1 1)) ; down
-    ('(-1 1) '(0 -1)) ; left
-    ('(0 -1) '(1 -1)))) ; up
-
-(defun guard-patrol (map pos dir)
-  (let ((visited (make-hash-table)))
-    (puthash pos t visited)
-    (cl-loop
-      do (setq pos (car (guard-direction map pos dir)))
-         (setq dir (cdr (guard-direction map pos dir)))
-         (message "Visiting position %S" pos)
-         (puthash pos t visited)
-      until (if (not (gethash pos map)) (progn (message "Not in map %S %S %S" pos (gethash (car (hash-table-keys map)) map) (equal '(129 . 129) (car (hash-table-keys map)))) t))
-      finally return (hash-table-count visited))))
+    
+    ;; Continue until guard leaves map
+    (let ((continue t))
+      (while continue
+        (let ((next-pos (next-position pos direction)))
+          (cond
+           ;; Check if next move would be out of bounds
+           ((not (in-bounds-p next-pos width height))
+            (setq continue nil))
+           ;; Obstacle ahead: turn right
+           ((char-equal (get-map-char map next-pos) ?#)
+            (setq direction (turn-right direction)))
+           ;; Move forward
+           (t
+            (setq pos next-pos)
+            (puthash pos t visited))))))
+    
+    ;; Return count of unique positions
+    (hash-table-count visited)))
 
 
 (setq raw-input6 
       (with-temp-buffer
         (insert-file-contents "input6.txt")
         (buffer-string)))
-(let* ((input raw-input6)
-      (map (parse-map input))
-      (start (cl-loop for key being the hash-keys of map
-                      when (equal (gethash key map) ?^)
-                      return key))
-      (dir '(0 -1)))
-  (progn
-    (message "The guard will visit %d distinct positions from %S" (guard-patrol map start dir) start)
-    (let ((keys (hash-table-keys map)))
-)))
+
+;; Test with example input
+(track-guard raw-input6)
 #+end_src
+
+** Part 2
