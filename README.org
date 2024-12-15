@@ -38,6 +38,9 @@ The *code is introduced in snippets* 💬, and the *complete code is available t
   - [[#part-2-5][Part 2]]
 - [[#day-7][Day 7]]
   - [[#part-2-6][Part 2]]
+- [[#day-8][Day 8]]
+  - [[#part-1-6][Part 1]]
+  - [[#part-2-7][Part 2]]
 
 * Day 1
 ** Part 1
@@ -807,4 +810,119 @@ Note: pretty slow
         (buffer-string)))
 
 (solve-calibration raw-input7)
+#+end_src
+
+
+* Day 8
+
+** Part 1
+
+#+begin_src elisp
+(defun parse-antenna-map (input)
+  "Parse input string into a hash table mapping frequencies to lists of points."
+  (let ((frequencies (make-hash-table :test 'equal))
+        (lines (split-string input "\n" t)))
+    (cl-loop for y from 0
+             for line in lines
+             do (cl-loop for x from 0
+                        for char across line
+                        unless (char-equal char ?.)
+                        do (push (cons x y)
+                               (gethash char frequencies))))
+    frequencies))
+
+(defun find-all-antinodes (input)
+  "Find all unique antinode positions in the input map."
+  (let ((frequencies (parse-antenna-map input))
+        (antinodes (make-hash-table :test 'equal))
+        (lines (split-string input "\n" t))
+        (width (length (car (split-string input "\n" t))))
+        (height (length (split-string input "\n" t))))
+    ;; For each frequency
+    (maphash 
+     (lambda (_freq points)
+       ;; For each pair of points with same frequency
+       (cl-loop for p1 in points
+                do (cl-loop for p2 in points
+                           unless (equal p1 p2)
+                           do (dolist (node (find-antinodes p1 p2))
+                                ;; Only count nodes within bounds with integer coordinates
+                                (when (and (integerp (car node))
+                                         (integerp (cdr node))
+                                         (>= (car node) 0)
+                                         (< (car node) width)
+                                         (>= (cdr node) 0)
+                                         (< (cdr node) height))
+                                  (puthash node t antinodes))))))
+     frequencies)
+    ;; Return count of unique antinodes
+    (hash-table-count antinodes)))
+
+;; Test with example input
+(setq example-input 
+"............
+........0...
+.....0......
+.......0....
+....0.......
+......A.....
+............
+............
+........A...
+.........A..
+............
+............")
+
+(find-all-antinodes example-input)  ; Should return 14
+
+;; Test with actual input
+(setq raw-input8 
+      (with-temp-buffer
+        (insert-file-contents "input8.txt")
+        (buffer-string)))
+
+(find-all-antinodes raw-input8)
+#+end_src
+
+** Part 2
+
+#+begin_src elisp
+(defun points-in-line-p (p1 p2 p3)
+  "Check if three points are in a line."
+  (let ((x1 (car p1)) (y1 (cdr p1))
+        (x2 (car p2)) (y2 (cdr p2))
+        (x3 (car p3)) (y3 (cdr p3)))
+    ;; Use cross product = 0 to check collinearity
+    (= 0 (- (* (- x2 x1) (- y3 y1))
+            (* (- y2 y1) (- x3 x1))))))
+
+(defun find-all-antinodes-v3 (input)
+  "Find all antinodes by checking every grid point."
+  (let* ((frequencies (parse-antenna-map input))
+         (lines (split-string input "\n" t))
+         (width (length (car lines)))
+         (height (length lines))
+         (antinodes (make-hash-table :test 'equal)))
+    
+    ;; For each point in the grid
+    (dotimes (y height)
+      (dotimes (x width)
+        (let ((point (cons x y)))
+          ;; Check against each frequency's antenna pairs
+          (maphash 
+           (lambda (_freq antennas)
+             ;; For each pair of antennas
+             (cl-loop for (a1 . rest) on antennas
+                      do (cl-loop for a2 in rest
+                                 ;; If point is collinear with antenna pair
+                                 when (points-in-line-p a1 a2 point)
+                                 do (puthash point t antinodes)
+                                 and return t)))  ; Can break inner loop once found
+           frequencies))))
+    
+    ;; Return count of unique antinodes
+    (hash-table-count antinodes)))
+
+;; Test with example and real input
+(find-all-antinodes-v3 raw-input8)
 #+end_src
