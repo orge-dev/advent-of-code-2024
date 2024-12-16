@@ -920,9 +920,7 @@ Note: pretty slow
                                  and return t)))  ; Can break inner loop once found
            frequencies))))
     
-    ;; Return count of unique antinodes
     (hash-table-count antinodes)))
 
-;; Test with example and real input
 (find-all-antinodes-v3 raw-input8)
 #+end_src
