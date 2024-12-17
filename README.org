@@ -956,7 +956,6 @@ def expand_disk_map(numbers):
 def compact_disk(expanded):
     # Move files to leftmost available space
     result = expanded.copy()
-    print("expanded", expanded)
     
     # Process from right to left
     for i in range(len(result)-1, -1, -1):
@@ -990,3 +989,4 @@ def solve_part1(input_str):
 with open("input9.txt") as inf:
         print(solve_part1(inf.read().strip()))
 #+end_src
+: 6323641412437
